@@ -1,10 +1,479 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Frete Inteligente</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts (Roboto & Montserrat) -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+            --secondary-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            --error-gradient: linear-gradient(135deg, #f87171 0%, #dc2626 100%);
+            --bg-color: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+        }
+
+        .main-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05), 0 5px 10px rgba(0, 0, 0, 0.03);
+            overflow: hidden;
+            border: none;
+            max-width: 950px;
+            width: 100%;
+        }
+
+        .gradient-header {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .gradient-header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
+        }
+
+        .gradient-header p {
+            font-size: 1rem;
+            opacity: 0.9;
+            margin-bottom: 0;
+            font-weight: 300;
+        }
+
+        .content-section {
+            padding: 40px;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #4b5563;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-control {
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-size: 1rem;
+            transition: all 0.2s ease-in-out;
+            color: var(--text-main);
+        }
+
+        .form-control:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
+            outline: none;
+        }
+
+        .btn-calculate {
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            letter-spacing: 0.5px;
+            transition: all 0.2s;
+            box-shadow: 0 4px 6px rgba(99, 102, 241, 0.2);
+        }
+
+        .btn-calculate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(99, 102, 241, 0.3);
+            color: white;
+        }
+
+        .btn-calculate:active {
+            transform: translateY(0);
+        }
+
+        /* Result container styling */
+        .result-container {
+            display: none;
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+
+        .result-card {
+            background-color: #f9fafb;
+            border: 2px solid #f3f4f6;
+            border-radius: 15px;
+            padding: 25px;
+            height: 100%;
+        }
+
+        .result-header {
+            border-bottom: 2px dashed #e5e7eb;
+            padding-bottom: 15px;
+            margin-bottom: 15px;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 1rem;
+        }
+
+        .detail-label {
+            color: var(--text-muted);
+        }
+
+        .detail-value {
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            border-top: 2px solid #e5e7eb;
+            padding-top: 15px;
+            margin-top: 15px;
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .total-value {
+            color: #4f46e5;
+        }
+
+        .badge-free {
+            background: var(--secondary-gradient);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        /* Alert and feedback styling */
+        .alert-custom-error {
+            background: #fef2f2;
+            border: 2px solid #fca5a5;
+            color: #b91c1c;
+            border-radius: 12px;
+            padding: 16px;
+            display: none;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 25px;
+            animation: shake 0.4s ease-in-out;
+        }
+
+        .rule-card {
+            background: #eef2ff;
+            border-left: 5px solid #6366f1;
+            border-radius: 8px;
+            padding: 15px;
+            font-size: 0.85rem;
+            color: #3730a3;
+        }
+
+        .rule-card h5 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .rule-card ul {
+            padding-left: 20px;
+            margin-bottom: 0;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        /* Interactive loading spinner */
+        .spinner-border-sm {
+            width: 1.2rem;
+            height: 1.2rem;
+            border-width: 0.15em;
+        }
+    </style>
 </head>
 <body>
 
+    <div class="main-card">
+        <!-- Header -->
+        <div class="gradient-header">
+            <h1><i class="fa-solid fa-truck-fast me-2"></i>Calculadora de Frete</h1>
+            <p>Descubra o valor do frete e os limites para frete grátis da sua região de forma instantânea</p>
+        </div>
+
+        <div class="content-section">
+            <!-- Custom Error Alert -->
+            <div class="alert-custom-error" id="error-alert">
+                <i class="fa-solid fa-circle-exclamation fa-lg"></i>
+                <div id="error-message">CEP inválido</div>
+            </div>
+
+            <div class="row g-4">
+                <!-- Form Column -->
+                <div class="col-lg-6">
+                    <form id="freight-form" novalidate>
+                        <!-- CEP Input -->
+                        <div class="mb-4">
+                            <label for="cep" class="form-label">CEP de Entrega</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-end-0 text-muted" style="border: 2px solid #e5e7eb; border-radius: 10px 0 0 10px;">
+                                    <i class="fa-solid fa-location-dot"></i>
+                                </span>
+                                <input type="text" class="form-control border-start-0" id="cep" name="cep" placeholder="00000-000" maxlength="9" required style="border-radius: 0 10px 10px 0;">
+                            </div>
+                            <div class="form-text text-muted">Ex: 01000-000 (Sudeste), 68000-000 (Norte)</div>
+                        </div>
+
+                        <!-- Carrinho Value Input -->
+                        <div class="mb-4">
+                            <label for="valor_carrinho" class="form-label">Valor do Carrinho (R$)</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-end-0 text-muted" style="border: 2px solid #e5e7eb; border-radius: 10px 0 0 10px;">
+                                    R$
+                                </span>
+                                <input type="number" class="form-control border-start-0" id="valor_carrinho" name="valor_carrinho" step="0.01" min="0.01" placeholder="0.00" required style="border-radius: 0 10px 10px 0;">
+                            </div>
+                            <div class="form-text text-muted">Informe o valor total dos produtos no carrinho.</div>
+                        </div>
+
+                        <!-- Calculate Button -->
+                        <button type="submit" class="btn btn-calculate w-100 d-flex align-items-center justify-content-center gap-2" id="btn-submit">
+                            <span>Calcular Frete</span>
+                            <div class="spinner-border spinner-border-sm text-light d-none" id="btn-spinner" role="status"></div>
+                        </button>
+                    </form>
+
+                    <!-- Info/Rules Card -->
+                    <div class="rule-card mt-4">
+                        <h5><i class="fa-solid fa-circle-info me-1"></i> Regras de Frete Grátis</h5>
+                        <ul>
+                            <li><strong>Região Norte:</strong> Frete grátis a partir de R$ 300,00 (caso contrário: R$ 40,00)</li>
+                            <li><strong>Demais Regiões:</strong> Frete grátis a partir de R$ 200,00</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Result Column -->
+                <div class="col-lg-6">
+                    <div class="result-container" id="result-container">
+                        <div class="result-card">
+                            <div class="result-header d-flex justify-content-between align-items-center">
+                                <h4 class="mb-0 text-dark"><i class="fa-solid fa-receipt me-2"></i>Resumo</h4>
+                                <span id="free-shipping-badge" class="badge-free d-none">Frete Grátis!</span>
+                            </div>
+
+                            <div class="detail-row">
+                                <span class="detail-label">Região:</span>
+                                <span class="detail-value" id="res-regiao">-</span>
+                            </div>
+
+                            <div class="detail-row">
+                                <span class="detail-label">Valor do Carrinho:</span>
+                                <span class="detail-value" id="res-carrinho">R$ 0,00</span>
+                            </div>
+
+                            <div class="detail-row">
+                                <span class="detail-label">Valor Original do Frete:</span>
+                                <span class="detail-value" id="res-frete-original">R$ 0,00</span>
+                            </div>
+
+                            <div class="detail-row">
+                                <span class="detail-label">Meta de Frete Grátis:</span>
+                                <span class="detail-value" id="res-limite">R$ 0,00</span>
+                            </div>
+
+                            <div class="detail-row mb-0">
+                                <span class="detail-label">Frete Aplicado:</span>
+                                <span class="detail-value text-success" id="res-frete-final">R$ 0,00</span>
+                            </div>
+
+                            <div class="total-row">
+                                <span>Total Geral:</span>
+                                <span class="total-value" id="res-total">R$ 0,00</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Placeholder when no calculation is made yet -->
+                    <div class="d-flex flex-column align-items-center justify-content-center text-center h-100 py-5" id="result-placeholder" style="border: 2px dashed #e5e7eb; border-radius: 15px; color: var(--text-muted);">
+                        <i class="fa-solid fa-truck-loading fa-3x mb-3 text-muted" style="opacity: 0.5;"></i>
+                        <h5>Aguardando Dados</h5>
+                        <p class="small px-4 mb-0">Preencha o CEP e o valor do carrinho. O cálculo será realizado de forma instantânea e automática ao alterar os campos.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        const form = document.getElementById('freight-form');
+        const cepInput = document.getElementById('cep');
+        const valorInput = document.getElementById('valor_carrinho');
+        const errorAlert = document.getElementById('error-alert');
+        const errorMessage = document.getElementById('error-message');
+        const resultContainer = document.getElementById('result-container');
+        const resultPlaceholder = document.getElementById('result-placeholder');
+        const btnSubmit = document.getElementById('btn-submit');
+        const btnSpinner = document.getElementById('btn-spinner');
+
+        // Formata o CEP em tempo real para o usuário (00000-000)
+        cepInput.addEventListener('input', (e) => {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 5) {
+                value = value.substring(0, 5) + '-' + value.substring(5, 8);
+            }
+            e.target.value = value;
+        });
+
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+        }
+
+        function hideAlerts() {
+            errorAlert.style.display = 'none';
+        }
+
+        function showError(msg) {
+            errorMessage.textContent = msg;
+            errorAlert.style.display = 'flex';
+            resultContainer.style.display = 'none';
+            resultPlaceholder.style.display = 'flex';
+        }
+
+        function showResult(data) {
+            resultPlaceholder.style.display = 'none';
+            resultContainer.style.display = 'block';
+
+            // Preenche os campos de resumo
+            document.getElementById('res-regiao').textContent = data.regiao;
+            document.getElementById('res-carrinho').textContent = formatCurrency(data.valor_carrinho);
+            document.getElementById('res-frete-original').textContent = formatCurrency(data.frete_original);
+            document.getElementById('res-limite').textContent = formatCurrency(data.limite_frete_gratis);
+
+            const freteFinal = data.frete;
+            const resFreteFinal = document.getElementById('res-frete-final');
+            const freeShippingBadge = document.getElementById('free-shipping-badge');
+
+            if (freteFinal === 0) {
+                resFreteFinal.textContent = 'Grátis';
+                resFreteFinal.className = 'detail-value text-success font-weight-bold';
+                freeShippingBadge.classList.remove('d-none');
+            } else {
+                resFreteFinal.textContent = formatCurrency(freteFinal);
+                resFreteFinal.className = 'detail-value text-dark';
+                freeShippingBadge.classList.add('d-none');
+            }
+
+            const totalGeral = data.valor_carrinho + freteFinal;
+            document.getElementById('res-total').textContent = formatCurrency(totalGeral);
+        }
+
+        // Função assíncrona principal de cálculo de frete
+        async function calcularFrete() {
+            const cep = cepInput.value.trim();
+            const valorRaw = valorInput.value.trim();
+
+            // Se um dos campos estiver vazio, não dispara erro prematuro
+            if (!cep || !valorRaw) {
+                return;
+            }
+
+            const valor = parseFloat(valorRaw);
+
+            // Mostrar estado de carregamento
+            btnSpinner.classList.remove('d-none');
+            btnSubmit.disabled = true;
+            hideAlerts();
+
+            try {
+                const response = await fetch('/calcular', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        cep: cep,
+                        valor_carrinho: valor
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showResult(data);
+                } else {
+                    showError(data.erro || 'Erro ao processar o cálculo.');
+                }
+            } catch (err) {
+                showError('Erro ao se conectar ao servidor da API.');
+                console.error(err);
+            } finally {
+                btnSpinner.classList.add('d-none');
+                btnSubmit.disabled = false;
+            }
+        }
+
+        // Submissão explícita do formulário
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            calcularFrete();
+        });
+
+        // RF-06: Recalcular quando o CEP ou valor do carrinho mudar (Event-driven)
+        cepInput.addEventListener('change', calcularFrete);
+        valorInput.addEventListener('change', calcularFrete);
+
+        // Recalcular automaticamente assim que o CEP atingir o formato completo (8 dígitos)
+        cepInput.addEventListener('input', (e) => {
+            const cleanCep = e.target.value.replace(/\D/g, '');
+            if (cleanCep.length === 8) {
+                calcularFrete();
+            }
+        });
+    </script>
 </body>
 </html>
